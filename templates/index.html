@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PlantDoc · CNN Plant Disease Diagnosis</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="leaf">&#127807;</span>
+      <div>
+        <h1>PlantDoc</h1>
+        <span class="tag">CNN-based plant disease diagnosis</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#model">Model</a>
+      <a href="#classes">Classes</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h2>Diagnose plant diseases from a leaf photo.</h2>
+      <p>Upload a leaf image and our convolutional neural network will identify the plant species and any disease present, with a confidence score for each candidate.</p>
+
+      {% if not model_ready %}
+      <div class="banner warn">
+        Model not yet trained. Run <code>python train.py</code> to produce <code>model/plant_disease_model.h5</code> before predictions will work.
+      </div>
+      {% else %}
+      <div class="banner ok">
+        Model loaded — {{ num_classes }} classes available.
+      </div>
+      {% endif %}
+
+      <div id="dropzone" class="dropzone">
+        <input type="file" id="fileInput" accept="image/*" hidden />
+        <div class="dz-inner">
+          <div class="dz-icon">&#128247;</div>
+          <p class="dz-title">Drop a leaf image here</p>
+          <p class="dz-sub">or <button type="button" id="browseBtn" class="link-btn">browse</button> · JPG, PNG, WebP up to 10 MB</p>
+        </div>
+      </div>
+
+      <div id="resultArea" class="result-area hidden">
+        <div class="preview-card">
+          <div class="preview-thumb">
+            <img id="previewImg" alt="Uploaded leaf preview" />
+          </div>
+          <div class="preview-meta">
+            <h3 id="topPlant">—</h3>
+            <p id="topCondition" class="condition">—</p>
+            <div class="confidence-row">
+              <span class="confidence-label">Confidence</span>
+              <span id="topConfidence" class="confidence-value">0%</span>
+            </div>
+            <div class="confidence-bar"><div id="topConfidenceBar"></div></div>
+            <p id="topDescription" class="description"></p>
+            <div id="treatmentBlock" class="treatment hidden">
+              <strong>Recommended action</strong>
+              <p id="topTreatment"></p>
+            </div>
+            <p class="meta-line"><span id="latency">—</span> · model input <span>128×128</span></p>
+          </div>
+        </div>
+
+        <div class="topk-card">
+          <h4>Top predictions</h4>
+          <ul id="topkList"></ul>
+        </div>
+        <button id="resetBtn" class="secondary">Try another image</button>
+      </div>
+
+      <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Analyzing leaf…</p>
+      </div>
+
+      <div id="errorBox" class="error-box hidden"></div>
+    </section>
+
+    <section id="how" class="info-grid">
+      <div class="info-card">
+        <h3>1. Preprocess</h3>
+        <p>Image resized to 128×128, converted to RGB, and normalized to [0, 1] — the same pipeline used during training.</p>
+      </div>
+      <div class="info-card">
+        <h3>2. CNN inference</h3>
+        <p>3 stacked convolution + pooling blocks (32 → 64 → 128 filters), flattened, then a 128-unit dense layer with 0.5 dropout before softmax.</p>
+      </div>
+      <div class="info-card">
+        <h3>3. Diagnose</h3>
+        <p>Softmax probabilities are returned across all classes. Top prediction surfaces plant species, disease, and a recommended action.</p>
+      </div>
+    </section>
+
+    <section id="model" class="model-section">
+      <h2>Model architecture</h2>
+      <pre class="arch">Input(128, 128, 3)
+  └─ Conv2D(32, 3×3, ReLU)  → MaxPool(2×2)
+  └─ Conv2D(64, 3×3, ReLU)  → MaxPool(2×2)
+  └─ Conv2D(128, 3×3, ReLU) → MaxPool(2×2)
+  └─ Flatten
+  └─ Dense(128, ReLU) → Dropout(0.5)
+  └─ Dense(N, Softmax)
+
+Optimizer: Adam     Loss: categorical cross-entropy
+Augmentation: rotation, zoom, shift, shear, horizontal flip
+Train/test split: 80 / 20  ·  Epochs: 20  ·  Batch: 32</pre>
+    </section>
+
+    <section id="classes" class="classes-section">
+      <h2>Supported classes</h2>
+      <p class="muted">Loaded from the trained model.</p>
+      <div id="classesGrid" class="classes-grid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built on the PlantVillage dataset · CNN methodology from the project research paper</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

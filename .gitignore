@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+.env
+.env.local
+
+# Trained model (regenerate with `python train.py`)
+model/*.h5
+model/*.keras
+model/*.pkl
+
+# Runtime uploads
+uploads/*
+!uploads/.gitkeep
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
