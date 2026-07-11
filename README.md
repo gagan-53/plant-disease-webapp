@@ -42,21 +42,22 @@ plant_disease_webapp/
 ## 1. Install
 
 ```bash
-cd /Users/bhaau/plant_disease_webapp
+cd plant-disease-webapp
 pip install -r requirements.txt
 ```
 
 ## 2. Train the model
 
 The training script expects the PlantVillage dataset arranged as one folder per class.
-A copy is already present at `/Users/bhaau/PlantVillage-Dataset/raw/color`.
+Download the `raw/color` split from the [PlantVillage-Dataset](https://github.com/spMohanty/PlantVillage-Dataset)
+repo (or Kaggle mirror) and note its path.
 
 ```bash
-# Full training (38 classes, ~54k images)
-python train.py --data-dir /Users/bhaau/PlantVillage-Dataset/raw/color
+# Full training (38 classes, ~54k images) — replace path/to with your data dir
+python train.py --data-dir path/to/PlantVillage-Dataset/raw/color
 
 # Fast smoke test (cap images per class)
-python train.py --data-dir /Users/bhaau/PlantVillage-Dataset/raw/color --max-per-class 50 --epochs 5
+python train.py --data-dir path/to/PlantVillage-Dataset/raw/color --max-per-class 50 --epochs 5
 ```
 
 Outputs land in `model/`:
