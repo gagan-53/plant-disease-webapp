@@ -29,7 +29,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.utils import to_categorical
 
 IMG_SIZE = 128
-DEFAULT_DATA_DIR = "/Users/bhaau/PlantVillage-Dataset/raw/color"
 MODEL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "model")
 
 
@@ -75,7 +74,7 @@ def build_model(num_classes):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-dir", default=DEFAULT_DATA_DIR,
+    parser.add_argument("--data-dir", required=True,
                         help="Path to PlantVillage color directory (one folder per class).")
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--batch-size", type=int, default=32)
